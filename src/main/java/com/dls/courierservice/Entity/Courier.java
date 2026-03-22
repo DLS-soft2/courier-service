@@ -1,5 +1,6 @@
 package com.dls.courierservice.Entity;
 
+import com.dls.courierservice.Enum.VehicleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,5 +26,13 @@ public class Courier {
 
     @Column(name = "email", nullable = false)
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "vehicle_type", nullable = false)
+    private VehicleType vehicleType;
+
+    private String rating;
+
+    private Boolean active;
 
 }
