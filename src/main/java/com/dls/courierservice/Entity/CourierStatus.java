@@ -1,9 +1,11 @@
 package com.dls.courierservice.Entity;
 
-import com.dls.courierservice.Enum.Status;
+import com.dls.courierservice.Enum.AvailabilityStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,14 +14,19 @@ import lombok.Setter;
 public class CourierStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "courier_status_id")
-    private Long courierStatusId;
+    private Long id;
 
-    @Column(name = "courier_id", nullable = false)
-    private Long courierId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "courier_id", nullable = false, unique = true)
+    private Courier courier;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private Status status;
-}
+    @Column(nullable = false)
+    private AvailabilityStatus status;
 
+    @Column(name = "current_location")
+    private String currentLocation;
+
+    @Column(name = "last_updated")
+    private LocalDateTime lastUpdated;
+}

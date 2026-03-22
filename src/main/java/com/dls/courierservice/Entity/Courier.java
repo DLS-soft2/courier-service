@@ -16,7 +16,7 @@ public class Courier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "courier_id")
-    private Long CourierId;
+    private Long courierId;
 
     @Column(name = "name", nullable = false)
     private String name;

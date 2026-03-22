@@ -49,12 +49,12 @@ public class CourierController {
         return ResponseEntity.status(HttpStatus.CREATED).body(courierService.addCourier(courierRequest));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<CourierResponse> updateCourier(@PathVariable Long id, @RequestBody CourierRequest courierRequest) {
         return ResponseEntity.ok(courierService.updateCourier(id, courierRequest));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<CourierResponse> deleteCourier(@PathVariable Long id) {
         return ResponseEntity.ok(courierService.deleteCourier(id));
     }

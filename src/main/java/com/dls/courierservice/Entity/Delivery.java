@@ -2,11 +2,18 @@ package com.dls.courierservice.Entity;
 
 import com.dls.courierservice.Enum.DeliveryStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "delivery")
+@Table(name = "delivery", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "order_id"),
+        @UniqueConstraint(columnNames = "delivery_id" ),
+})
+@Getter
+@Setter
 public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +43,3 @@ public class Delivery {
 
     private String notes;
 }
-
