@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,6 +60,7 @@ public class CourierAssignmentService {
         this.couriersTopic = couriersTopic;
     }
 
+    @Transactional
     public void assignCourier(RestaurantAcceptedEvent event) {
         List<CourierStatus> availableStatuses = courierStatusRepository.findByStatus(AvailabilityStatus.AVAILABLE);
         List<CourierStatus> candidates = availableStatuses.stream()

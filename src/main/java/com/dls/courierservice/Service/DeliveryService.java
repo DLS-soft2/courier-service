@@ -94,6 +94,7 @@ public class DeliveryService {
         Courier courier = courierRepository.findById(deliveryRequest.getCourierId())
                 .orElseThrow(() -> new RuntimeException("Courier not found with id: " + deliveryRequest.getCourierId()));
 
+        DeliveryStatus previousStatus = existingDelivery.getStatus();
         existingDelivery.setCourier(courier);
         existingDelivery.setOrderId(deliveryRequest.getOrderId());
         existingDelivery.setCustomerId(deliveryRequest.getCustomerId());
@@ -104,7 +105,6 @@ public class DeliveryService {
         existingDelivery.setCompletedAt(deliveryRequest.getCompletedAt());
         existingDelivery.setNotes(deliveryRequest.getNotes());
 
-        DeliveryStatus previousStatus = existingDelivery.getStatus();
         Delivery saved = deliveryRepository.save(existingDelivery);
 
         if (deliveryRequest.getStatus() == DeliveryStatus.DELIVERED && previousStatus != DeliveryStatus.DELIVERED) {

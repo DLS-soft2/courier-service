@@ -16,7 +16,7 @@ public class CourierStatus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "courier_id", nullable = false, unique = true)
     private Courier courier;
 
