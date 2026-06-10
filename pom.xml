@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.dls</groupId>
     <artifactId>courier-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>courier-service</name>
     <description>courier-service</description>
     <url/>
