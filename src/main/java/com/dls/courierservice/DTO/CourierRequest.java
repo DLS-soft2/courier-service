@@ -11,6 +11,6 @@ public class CourierRequest {
     private String phoneNumber;
     private String email;
     private VehicleType vehicleType;
-    private String rating;
+    private Double rating;
     private Boolean active;
 }
