@@ -5,11 +5,12 @@ import com.dls.courierservice.Enum.DeliveryStatus;
 import com.dls.courierservice.Repository.CourierRepository;
 import com.dls.courierservice.Repository.DeliveryRepository;
 import com.dls.courierservice.Service.DeliveryService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,8 +23,15 @@ class DeliveryServiceValidationTest {
     @Mock
     private CourierRepository courierRepository;
 
-    @InjectMocks
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     private DeliveryService deliveryService;
+
+    @BeforeEach
+    void setUp() {
+        deliveryService = new DeliveryService(deliveryRepository, courierRepository, kafkaTemplate, "deliveries");
+    }
 
     @Test
     void addDelivery_rejectsNullOrderId() {
