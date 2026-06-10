@@ -60,6 +60,7 @@ public class DeliveryService {
         Delivery delivery = new Delivery();
         delivery.setCourier(courier);
         delivery.setOrderId(deliveryRequest.getOrderId());
+        delivery.setCustomerId(deliveryRequest.getCustomerId());
         delivery.setStatus(deliveryRequest.getStatus());
         delivery.setPickupAddress(deliveryRequest.getPickupAddress());
         delivery.setDeliveryAddress(deliveryRequest.getDeliveryAddress());
@@ -81,6 +82,7 @@ public class DeliveryService {
 
         existingDelivery.setCourier(courier);
         existingDelivery.setOrderId(deliveryRequest.getOrderId());
+        existingDelivery.setCustomerId(deliveryRequest.getCustomerId());
         existingDelivery.setStatus(deliveryRequest.getStatus());
         existingDelivery.setPickupAddress(deliveryRequest.getPickupAddress());
         existingDelivery.setDeliveryAddress(deliveryRequest.getDeliveryAddress());
@@ -99,6 +101,9 @@ public class DeliveryService {
     }
 
     private void validateDeliveryRequest(DeliveryRequest request) {
+        if (request.getOrderId() == null || request.getOrderId().isBlank()) {
+            throw new IllegalArgumentException("Order ID cannot be null or blank");
+        }
         if (request.getCourierId() == null) {
             throw new IllegalArgumentException("Courier ID cannot be null");
         }

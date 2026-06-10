@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,6 +58,7 @@ public class CourierService {
         validateCourierActive(courierRequest.getActive());
 
         Courier courier = new Courier();
+        courier.setExternalUuid(UUID.randomUUID().toString());
         courier.setName(courierRequest.getName());
         courier.setPhoneNumber(courierRequest.getPhoneNumber());
         courier.setEmail(courierRequest.getEmail());
@@ -132,13 +134,12 @@ public class CourierService {
         }
     }
 
-    private void validateCourierRating(String rating) {
-        if (rating != null && !rating.matches("^[0-5](\\.0)?$")) {
-            throw new IllegalArgumentException("Courier rating must be a number between 0 and 5, optionally with one decimal place");
+    private void validateCourierRating(Double rating) {
+        if (rating == null) {
+            return;
         }
-
-        if (rating != null && rating.length() > 3) {
-            throw new IllegalArgumentException("Courier rating cannot exceed 3 characters");
+        if (rating < 0.0 || rating > 5.0) {
+            throw new IllegalArgumentException("Courier rating must be between 0.0 and 5.0");
         }
     }
 
