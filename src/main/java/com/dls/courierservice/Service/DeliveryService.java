@@ -5,22 +5,36 @@ import com.dls.courierservice.DTO.DeliveryResponse;
 import com.dls.courierservice.Entity.Courier;
 import com.dls.courierservice.Entity.Delivery;
 import com.dls.courierservice.Enum.DeliveryStatus;
+import com.dls.courierservice.Kafka.DeliveryCompletedEvent;
 import com.dls.courierservice.Repository.CourierRepository;
 import com.dls.courierservice.Repository.DeliveryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class DeliveryService {
 
+    private static final Logger log = LoggerFactory.getLogger(DeliveryService.class);
+
     private final DeliveryRepository deliveryRepository;
     private final CourierRepository courierRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final String deliveriesTopic;
 
-    public DeliveryService(DeliveryRepository deliveryRepository, CourierRepository courierRepository) {
+    public DeliveryService(DeliveryRepository deliveryRepository, CourierRepository courierRepository,
+                           KafkaTemplate<String, Object> kafkaTemplate,
+                           @Value("${app.kafka.topic.deliveries}") String deliveriesTopic) {
         this.deliveryRepository = deliveryRepository;
         this.courierRepository = courierRepository;
+        this.kafkaTemplate = kafkaTemplate;
+        this.deliveriesTopic = deliveriesTopic;
     }
 
     public List<DeliveryResponse> getAllDeliveries() {
@@ -90,7 +104,34 @@ public class DeliveryService {
         existingDelivery.setCompletedAt(deliveryRequest.getCompletedAt());
         existingDelivery.setNotes(deliveryRequest.getNotes());
 
-        return new DeliveryResponse(deliveryRepository.save(existingDelivery));
+        DeliveryStatus previousStatus = existingDelivery.getStatus();
+        Delivery saved = deliveryRepository.save(existingDelivery);
+
+        if (deliveryRequest.getStatus() == DeliveryStatus.DELIVERED && previousStatus != DeliveryStatus.DELIVERED) {
+            publishDeliveryCompleted(saved);
+        }
+
+        return new DeliveryResponse(saved);
+    }
+
+    public void completeDelivery(String orderId) {
+        Delivery delivery = deliveryRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new RuntimeException("Delivery not found for order_id: " + orderId));
+        if (delivery.getStatus() == DeliveryStatus.DELIVERED) {
+            log.info("Delivery already DELIVERED for order_id={}, skipping", orderId);
+            return;
+        }
+        delivery.setStatus(DeliveryStatus.DELIVERED);
+        delivery.setCompletedAt(LocalDateTime.now());
+        deliveryRepository.save(delivery);
+        publishDeliveryCompleted(delivery);
+    }
+
+    private void publishDeliveryCompleted(Delivery delivery) {
+        DeliveryCompletedEvent event = new DeliveryCompletedEvent(
+                delivery.getOrderId(), delivery.getCustomerId());
+        kafkaTemplate.send(deliveriesTopic, delivery.getOrderId(), event);
+        log.info("Published DeliveryCompleted for order_id={}", delivery.getOrderId());
     }
 
     public DeliveryResponse deleteDelivery(Long id) {
