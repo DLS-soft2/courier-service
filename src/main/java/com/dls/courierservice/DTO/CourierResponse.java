@@ -11,16 +11,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CourierResponse {
     private Long courierId;
+    private String externalUuid;
     private String name;
     private String phoneNumber;
     private VehicleType vehicleType;
     private String email;
-    private String rating;
+    private Double rating;
     private Boolean active;
-
 
     public CourierResponse(Courier courier) {
         this.courierId = courier.getCourierId();
+        this.externalUuid = courier.getExternalUuid();
         this.name = courier.getName();
         this.phoneNumber = courier.getPhoneNumber();
         this.email = courier.getEmail();
@@ -28,6 +29,4 @@ public class CourierResponse {
         this.rating = courier.getRating();
         this.active = courier.getActive();
     }
-
-
 }

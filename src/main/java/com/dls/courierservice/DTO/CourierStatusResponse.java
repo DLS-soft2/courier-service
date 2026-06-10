@@ -15,4 +15,6 @@ public class CourierStatusResponse {
     private String description;
     private Long courierId;
     private Long timestamp;
+    private Double latitude;
+    private Double longitude;
 }

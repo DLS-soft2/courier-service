@@ -10,17 +10,20 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "delivery", uniqueConstraints = {
         @UniqueConstraint(columnNames = "order_id"),
-        @UniqueConstraint(columnNames = "delivery_id" ),
 })
 @Getter
 @Setter
 public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "delivery_id")
     private Long deliveryId;
 
     @Column(name = "order_id")
-    private Long orderId;
+    private String orderId;
+
+    @Column(name = "customer_id")
+    private String customerId;
 
     @ManyToOne
     @JoinColumn(name = "courier_id")

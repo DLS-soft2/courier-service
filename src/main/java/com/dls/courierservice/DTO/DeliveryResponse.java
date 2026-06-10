@@ -1,7 +1,6 @@
 package com.dls.courierservice.DTO;
 
 import com.dls.courierservice.Entity.Delivery;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +14,8 @@ public class DeliveryResponse {
 
     private long deliveryId;
     private long courierId;
-    private long orderId;
+    private String orderId;
+    private String customerId;
     private String status;
     private String pickupAddress;
     private String deliveryAddress;
@@ -27,6 +27,7 @@ public class DeliveryResponse {
         this.deliveryId = delivery.getDeliveryId();
         this.courierId = delivery.getCourier().getCourierId();
         this.orderId = delivery.getOrderId();
+        this.customerId = delivery.getCustomerId();
         this.status = delivery.getStatus().name();
         this.pickupAddress = delivery.getPickupAddress();
         this.deliveryAddress = delivery.getDeliveryAddress();

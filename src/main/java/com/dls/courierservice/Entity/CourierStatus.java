@@ -24,8 +24,9 @@ public class CourierStatus {
     @Column(nullable = false)
     private AvailabilityStatus status;
 
-    @Column(name = "current_location")
-    private String currentLocation;
+    private Double latitude;
+
+    private Double longitude;
 
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated;

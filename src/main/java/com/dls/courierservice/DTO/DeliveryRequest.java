@@ -1,7 +1,6 @@
 package com.dls.courierservice.DTO;
 
 import com.dls.courierservice.Enum.DeliveryStatus;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class DeliveryRequest {
-    private Long orderId;
+    private String orderId;
+    private String customerId;
     private Long courierId;
     private DeliveryStatus status;
     private String pickupAddress;

@@ -18,6 +18,9 @@ public class Courier {
     @Column(name = "courier_id")
     private Long courierId;
 
+    @Column(name = "external_uuid", unique = true)
+    private String externalUuid;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -31,8 +34,7 @@ public class Courier {
     @Column(name = "vehicle_type", nullable = false)
     private VehicleType vehicleType;
 
-    private String rating;
+    private Double rating;
 
     private Boolean active;
-
 }
