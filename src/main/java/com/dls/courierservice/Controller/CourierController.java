@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/couriers")
+@RequestMapping("/api/v2/couriers")
 public class CourierController {
 
     private final CourierService courierService;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/deliveries")
+@RequestMapping("/api/v2/deliveries")
 public class DeliveryController {
 
     private final DeliveryService deliveryService;
