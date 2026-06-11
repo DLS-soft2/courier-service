@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Component
 @Profile("!test")
@@ -37,7 +38,7 @@ public class InitData implements CommandLineRunner {
         }
 
         Courier courier1 = new Courier();
-        courier1.setExternalUuid("c56a4180-65aa-42ec-a945-5fd21dec0538");
+        courier1.setCourierId("c56a4180-65aa-42ec-a945-5fd21dec0538");
         courier1.setName("Ox");
         courier1.setPhoneNumber("22335432");
         courier1.setEmail("oxCourier@gmail.com");
@@ -47,7 +48,7 @@ public class InitData implements CommandLineRunner {
         courierRepository.save(courier1);
 
         Courier courier2 = new Courier();
-        courier2.setExternalUuid("f47ac10b-58cc-4372-a567-0e02b2c3d479");
+        courier2.setCourierId("f47ac10b-58cc-4372-a567-0e02b2c3d479");
         courier2.setName("DLS");
         courier2.setPhoneNumber("22335433");
         courier2.setEmail("dls@gmail.com");
@@ -57,6 +58,7 @@ public class InitData implements CommandLineRunner {
         courierRepository.save(courier2);
 
         CourierStatus status1 = new CourierStatus();
+        status1.setId(UUID.randomUUID().toString());
         status1.setCourier(courier1);
         status1.setStatus(AvailabilityStatus.AVAILABLE);
         status1.setLatitude(55.6761);
@@ -65,6 +67,7 @@ public class InitData implements CommandLineRunner {
         courierStatusRepository.save(status1);
 
         CourierStatus status2 = new CourierStatus();
+        status2.setId(UUID.randomUUID().toString());
         status2.setCourier(courier2);
         status2.setStatus(AvailabilityStatus.AVAILABLE);
         status2.setLatitude(55.6867);
@@ -73,6 +76,7 @@ public class InitData implements CommandLineRunner {
         courierStatusRepository.save(status2);
 
         Delivery delivery1 = new Delivery();
+        delivery1.setDeliveryId(UUID.randomUUID().toString());
         delivery1.setCourier(courier1);
         delivery1.setStatus(DeliveryStatus.ASSIGNED);
         delivery1.setOrderId("550e8400-e29b-41d4-a716-446655440001");
@@ -83,6 +87,7 @@ public class InitData implements CommandLineRunner {
         deliveryRepository.save(delivery1);
 
         Delivery delivery2 = new Delivery();
+        delivery2.setDeliveryId(UUID.randomUUID().toString());
         delivery2.setCourier(courier2);
         delivery2.setStatus(DeliveryStatus.IN_TRANSIT);
         delivery2.setOrderId("550e8400-e29b-41d4-a716-446655440002");

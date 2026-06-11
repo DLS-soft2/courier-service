@@ -45,12 +45,11 @@ class DeliveryCompletionTest {
     @Test
     void completeDelivery_setsStatusAndPublishesEvent() {
         Courier courier = new Courier();
-        courier.setCourierId(1L);
-        courier.setExternalUuid("uuid-c1");
+        courier.setCourierId("uuid-c1");
         courier.setVehicleType(VehicleType.BIKE);
 
         Delivery delivery = new Delivery();
-        delivery.setDeliveryId(10L);
+        delivery.setDeliveryId("del-uuid-10");
         delivery.setOrderId("order-999");
         delivery.setCustomerId("cust-888");
         delivery.setCourier(courier);
@@ -84,12 +83,11 @@ class DeliveryCompletionTest {
     @Test
     void completeDelivery_alreadyDelivered_doesNotPublishAgain() {
         Courier courier = new Courier();
-        courier.setCourierId(1L);
-        courier.setExternalUuid("uuid-c1");
+        courier.setCourierId("uuid-c1");
         courier.setVehicleType(VehicleType.BIKE);
 
         Delivery delivery = new Delivery();
-        delivery.setDeliveryId(10L);
+        delivery.setDeliveryId("del-uuid-10");
         delivery.setOrderId("order-999");
         delivery.setCustomerId("cust-888");
         delivery.setCourier(courier);

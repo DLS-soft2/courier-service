@@ -10,10 +10,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourierStatusResponse {
-    private Long id;
+    private String id;
     private String status;
     private String description;
-    private Long courierId;
+    private String courierId;
     private Long timestamp;
     private Double latitude;
     private Double longitude;

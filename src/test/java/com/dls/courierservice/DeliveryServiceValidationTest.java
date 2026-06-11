@@ -50,7 +50,7 @@ class DeliveryServiceValidationTest {
     private DeliveryRequest buildValidRequest() {
         DeliveryRequest request = new DeliveryRequest();
         request.setOrderId("550e8400-e29b-41d4-a716-446655440001");
-        request.setCourierId(1L);
+        request.setCourierId("c56a4180-65aa-42ec-a945-5fd21dec0538");
         request.setStatus(DeliveryStatus.ASSIGNED);
         request.setPickupAddress("Vesterbrogade 1, 1620 København");
         request.setDeliveryAddress("Nørrebrogade 20, 2200 København");

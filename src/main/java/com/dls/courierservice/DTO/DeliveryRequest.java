@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class DeliveryRequest {
     private String orderId;
     private String customerId;
-    private Long courierId;
+    private String courierId;
     private DeliveryStatus status;
     private String pickupAddress;
     private String deliveryAddress;

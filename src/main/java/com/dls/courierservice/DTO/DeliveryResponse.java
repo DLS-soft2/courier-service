@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class DeliveryResponse {
 
-    private long deliveryId;
-    private long courierId;
+    private String deliveryId;
+    private String courierId;
     private String orderId;
     private String customerId;
     private String status;

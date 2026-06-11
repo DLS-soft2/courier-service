@@ -57,15 +57,13 @@ class CourierAssignmentServiceTest {
                 courierStatusRepository, deliveryRepository, aiServiceClient, kafkaTemplate, "couriers");
 
         courier1 = new Courier();
-        courier1.setCourierId(1L);
-        courier1.setExternalUuid("uuid-courier-1");
+        courier1.setCourierId("uuid-courier-1");
         courier1.setRating(4.5);
         courier1.setActive(true);
         courier1.setVehicleType(VehicleType.BIKE);
 
         courier2 = new Courier();
-        courier2.setCourierId(2L);
-        courier2.setExternalUuid("uuid-courier-2");
+        courier2.setCourierId("uuid-courier-2");
         courier2.setRating(3.0);
         courier2.setActive(true);
         courier2.setVehicleType(VehicleType.CAR);
@@ -114,10 +112,12 @@ class CourierAssignmentServiceTest {
         ArgumentCaptor<Delivery> deliveryCaptor = ArgumentCaptor.forClass(Delivery.class);
         verify(deliveryRepository).save(deliveryCaptor.capture());
         Delivery saved = deliveryCaptor.getValue();
+        assertNotNull(saved.getDeliveryId(), "deliveryId must be set before save");
+        assertEquals(36, saved.getDeliveryId().length(), "deliveryId must be UUID format (36 chars)");
         assertEquals("550e8400-e29b-41d4-a716-446655440011", saved.getOrderId());
         assertEquals("cust-222", saved.getCustomerId());
         assertEquals(DeliveryStatus.ASSIGNED, saved.getStatus());
-        assertEquals("uuid-courier-2", saved.getCourier().getExternalUuid());
+        assertEquals("uuid-courier-2", saved.getCourier().getCourierId());
 
         ArgumentCaptor<CourierAssignedEvent> eventCaptor = ArgumentCaptor.forClass(CourierAssignedEvent.class);
         verify(kafkaTemplate).send(eq("couriers"), eq("550e8400-e29b-41d4-a716-446655440011"), eventCaptor.capture());
@@ -165,7 +165,7 @@ class CourierAssignmentServiceTest {
     }
 
     @Test
-    void assignCourier_usesExternalUuidNotNumericId() {
+    void assignCourier_usesUuidPrimaryKeyOnWire() {
         when(courierStatusRepository.findByStatus(AvailabilityStatus.AVAILABLE))
                 .thenReturn(List.of(status1));
         when(deliveryRepository.countByCourierAndStatusNotIn(any(), anyList())).thenReturn(0);
@@ -187,7 +187,7 @@ class CourierAssignmentServiceTest {
         verify(kafkaTemplate).send(eq("couriers"), anyString(), eventCaptor.capture());
         String publishedCourierId = eventCaptor.getValue().getCourierId();
         assertEquals("uuid-courier-1", publishedCourierId);
-        assertNotEquals(String.valueOf(courier1.getCourierId()), publishedCourierId);
+        assertEquals(courier1.getCourierId(), publishedCourierId);
     }
 
     @Test
