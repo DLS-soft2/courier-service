@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +45,7 @@ public class DeliveryService {
                 .collect(Collectors.toList());
     }
 
-    public List<DeliveryResponse> getDeliveriesByCourierId(Long courierId) {
+    public List<DeliveryResponse> getDeliveriesByCourierId(String courierId) {
         return deliveryRepository.findByCourier_CourierId(courierId)
                 .stream()
                 .map(DeliveryResponse::new)
@@ -59,7 +60,7 @@ public class DeliveryService {
                 .collect(Collectors.toList());
     }
 
-    public DeliveryResponse getDeliveryById(Long id) {
+    public DeliveryResponse getDeliveryById(String id) {
         return deliveryRepository.findById(id)
                 .map(DeliveryResponse::new)
                 .orElseThrow(() -> new RuntimeException("Delivery not found with id: " + id));
@@ -72,6 +73,7 @@ public class DeliveryService {
                 .orElseThrow(() -> new RuntimeException("Courier not found with id: " + deliveryRequest.getCourierId()));
 
         Delivery delivery = new Delivery();
+        delivery.setDeliveryId(UUID.randomUUID().toString());
         delivery.setCourier(courier);
         delivery.setOrderId(deliveryRequest.getOrderId());
         delivery.setCustomerId(deliveryRequest.getCustomerId());
@@ -85,7 +87,7 @@ public class DeliveryService {
         return new DeliveryResponse(deliveryRepository.save(delivery));
     }
 
-    public DeliveryResponse updateDelivery(Long id, DeliveryRequest deliveryRequest) {
+    public DeliveryResponse updateDelivery(String id, DeliveryRequest deliveryRequest) {
         validateDeliveryRequest(deliveryRequest);
 
         Delivery existingDelivery = deliveryRepository.findById(id)
@@ -134,7 +136,7 @@ public class DeliveryService {
         log.info("Published DeliveryCompleted for order_id={}", delivery.getOrderId());
     }
 
-    public DeliveryResponse deleteDelivery(Long id) {
+    public DeliveryResponse deleteDelivery(String id) {
         Delivery delivery = deliveryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Delivery not found with id: " + id));
         deliveryRepository.delete(delivery);
@@ -145,11 +147,8 @@ public class DeliveryService {
         if (request.getOrderId() == null || request.getOrderId().isBlank()) {
             throw new IllegalArgumentException("Order ID cannot be null or blank");
         }
-        if (request.getCourierId() == null) {
-            throw new IllegalArgumentException("Courier ID cannot be null");
-        }
-        if (request.getCourierId() <= 0) {
-            throw new IllegalArgumentException("Courier ID must be a positive number");
+        if (request.getCourierId() == null || request.getCourierId().isBlank()) {
+            throw new IllegalArgumentException("Courier ID cannot be null or blank");
         }
         if (request.getStatus() == null) {
             throw new IllegalArgumentException("Delivery status cannot be null");

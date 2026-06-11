@@ -25,7 +25,7 @@ public class CourierService {
         return courierRepository.findAll().stream().map(CourierResponse::new).collect(Collectors.toList());
     }
 
-    public CourierResponse getCourierById(Long id) {
+    public CourierResponse getCourierById(String id) {
         return courierRepository.findById(id).map(CourierResponse::new).orElseThrow(
                 () -> new RuntimeException("Courier not found with id: " + id)
         );
@@ -58,7 +58,7 @@ public class CourierService {
         validateCourierActive(courierRequest.getActive());
 
         Courier courier = new Courier();
-        courier.setExternalUuid(UUID.randomUUID().toString());
+        courier.setCourierId(UUID.randomUUID().toString());
         courier.setName(courierRequest.getName());
         courier.setPhoneNumber(courierRequest.getPhoneNumber());
         courier.setEmail(courierRequest.getEmail());
@@ -69,7 +69,7 @@ public class CourierService {
         return new CourierResponse(courierRepository.save(courier));
     }
 
-    public CourierResponse updateCourier(Long id, @Valid CourierRequest courierRequest) {
+    public CourierResponse updateCourier(String id, @Valid CourierRequest courierRequest) {
         Courier courier = courierRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Courier not found with id: " + id)
         );
@@ -87,7 +87,7 @@ public class CourierService {
         return new CourierResponse(courierRepository.save(courier));
     }
 
-    public CourierResponse deleteCourier(Long id) {
+    public CourierResponse deleteCourier(String id) {
         Courier courier = courierRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Courier not found with id: " + id)
         );

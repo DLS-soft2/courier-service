@@ -14,12 +14,8 @@ import lombok.Setter;
 })
 public class Courier {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "courier_id")
-    private Long courierId;
-
-    @Column(name = "external_uuid", unique = true)
-    private String externalUuid;
+    private String courierId;
 
     @Column(name = "name", nullable = false)
     private String name;

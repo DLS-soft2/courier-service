@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 public class DeliveryStatusHistory {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "delivery_id")

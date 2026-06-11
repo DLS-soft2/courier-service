@@ -29,7 +29,7 @@ public class CourierController {
 
     @GetMapping("/{id}")
     @RequirePermission(Permission.COURIERS_READ)
-    public ResponseEntity<CourierResponse> getCourierById(@PathVariable Long id) {
+    public ResponseEntity<CourierResponse> getCourierById(@PathVariable String id) {
         return ResponseEntity.ok(courierService.getCourierById(id));
     }
 
@@ -59,13 +59,13 @@ public class CourierController {
 
     @PutMapping("/{id}")
     @RequirePermission(Permission.COURIERS_UPDATE)
-    public ResponseEntity<CourierResponse> updateCourier(@PathVariable Long id, @RequestBody CourierRequest courierRequest) {
+    public ResponseEntity<CourierResponse> updateCourier(@PathVariable String id, @RequestBody CourierRequest courierRequest) {
         return ResponseEntity.ok(courierService.updateCourier(id, courierRequest));
     }
 
     @DeleteMapping("/{id}")
     @RequirePermission(Permission.COURIERS_UPDATE)
-    public ResponseEntity<CourierResponse> deleteCourier(@PathVariable Long id) {
+    public ResponseEntity<CourierResponse> deleteCourier(@PathVariable String id) {
         return ResponseEntity.ok(courierService.deleteCourier(id));
     }
 }

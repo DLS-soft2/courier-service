@@ -66,13 +66,13 @@ class CourierServiceValidationTest {
     }
 
     @Test
-    void addCourier_generatesExternalUuid() {
+    void addCourier_generatesUuidPrimaryKey() {
         when(courierRepository.save(any(Courier.class))).thenAnswer(inv -> inv.getArgument(0));
 
         CourierRequest request = validRequest();
         var response = courierService.addCourier(request);
-        assertNotNull(response.getExternalUuid());
-        assertEquals(36, response.getExternalUuid().length());
+        assertNotNull(response.getCourierId());
+        assertEquals(36, response.getCourierId().length());
     }
 
     private CourierRequest validRequest() {

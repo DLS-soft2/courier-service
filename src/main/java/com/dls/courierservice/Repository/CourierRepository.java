@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CourierRepository extends JpaRepository<Courier, Long> {
+public interface CourierRepository extends JpaRepository<Courier, String> {
     Optional<Courier> findByName(String name);
     Optional<Courier> findByPhoneNumber(String phoneNumber);
     Optional<Courier> findByEmail(String email);

@@ -83,11 +83,12 @@ public class CourierAssignmentService {
         String topCourierId = rankings.getFirst().getCourierId();
         Courier selectedCourier = candidates.stream()
                 .map(CourierStatus::getCourier)
-                .filter(c -> topCourierId.equals(c.getExternalUuid()))
+                .filter(c -> topCourierId.equals(c.getCourierId()))
                 .findFirst()
                 .orElse(candidates.getFirst().getCourier());
 
         Delivery delivery = new Delivery();
+        delivery.setDeliveryId(UUID.randomUUID().toString());
         delivery.setOrderId(event.getOrderId());
         delivery.setCustomerId(event.getCustomerId());
         delivery.setCourier(selectedCourier);
@@ -96,10 +97,10 @@ public class CourierAssignmentService {
         deliveryRepository.save(delivery);
 
         CourierAssignedEvent assignedEvent = new CourierAssignedEvent(
-                event.getOrderId(), event.getCustomerId(), selectedCourier.getExternalUuid());
+                event.getOrderId(), event.getCustomerId(), selectedCourier.getCourierId());
         kafkaTemplate.send(couriersTopic, event.getOrderId(), assignedEvent);
         log.info("Published CourierAssigned for order_id={}, courier_id={}",
-                event.getOrderId(), selectedCourier.getExternalUuid());
+                event.getOrderId(), selectedCourier.getCourierId());
     }
 
     private AssignmentRequest buildAssignmentRequest(RestaurantAcceptedEvent event, List<CourierStatus> candidates) {
@@ -117,7 +118,7 @@ public class CourierAssignmentService {
     private CourierCandidate toCourierCandidate(CourierStatus cs) {
         Courier courier = cs.getCourier();
         CourierCandidate candidate = new CourierCandidate();
-        candidate.setCourierId(courier.getExternalUuid());
+        candidate.setCourierId(courier.getCourierId());
         candidate.setCurrentLocation(new Location(
                 cs.getLatitude() != null ? cs.getLatitude() : 0.0,
                 cs.getLongitude() != null ? cs.getLongitude() : 0.0));

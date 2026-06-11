@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Table(name = "courier_status")
 public class CourierStatus {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private String id;
 
     @OneToOne
     @JoinColumn(name = "courier_id", nullable = false, unique = true)

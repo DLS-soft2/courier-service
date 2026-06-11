@@ -28,7 +28,7 @@ public class DeliveryController {
 
     @GetMapping("/courier/{courierId}")
     @RequirePermission(Permission.DELIVERIES_READ)
-    public ResponseEntity<List<DeliveryResponse>> getDeliveriesByCourierId(@PathVariable Long courierId) {
+    public ResponseEntity<List<DeliveryResponse>> getDeliveriesByCourierId(@PathVariable String courierId) {
         return ResponseEntity.ok(deliveryService.getDeliveriesByCourierId(courierId));
     }
 
@@ -40,7 +40,7 @@ public class DeliveryController {
 
     @GetMapping("/{id}")
     @RequirePermission(Permission.DELIVERIES_READ)
-    public ResponseEntity<DeliveryResponse> getDeliveryById(@PathVariable Long id) {
+    public ResponseEntity<DeliveryResponse> getDeliveryById(@PathVariable String id) {
         return ResponseEntity.ok(deliveryService.getDeliveryById(id));
     }
 
@@ -52,7 +52,7 @@ public class DeliveryController {
 
     @PutMapping("/{id}")
     @RequirePermission(Permission.DELIVERIES_UPDATE)
-    public ResponseEntity<DeliveryResponse> updateDelivery(@PathVariable Long id, @RequestBody DeliveryRequest deliveryRequest) {
+    public ResponseEntity<DeliveryResponse> updateDelivery(@PathVariable String id, @RequestBody DeliveryRequest deliveryRequest) {
         return ResponseEntity.ok(deliveryService.updateDelivery(id, deliveryRequest));
     }
 
@@ -65,7 +65,7 @@ public class DeliveryController {
 
     @DeleteMapping("/{id}")
     @RequirePermission(Permission.DELIVERIES_UPDATE)
-    public ResponseEntity<Void> deleteDelivery(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDelivery(@PathVariable String id) {
         deliveryService.deleteDelivery(id);
         return ResponseEntity.noContent().build();
     }

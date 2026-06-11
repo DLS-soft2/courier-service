@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CourierStatusRepository extends JpaRepository<CourierStatus, Long> {
+public interface CourierStatusRepository extends JpaRepository<CourierStatus, String> {
     List<CourierStatus> findByStatus(AvailabilityStatus status);
 }

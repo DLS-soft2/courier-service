@@ -8,7 +8,7 @@ import lombok.Setter;
 public class CourierStatusRequest {
     private String status;
     private String description;
-    private Long courierId;
+    private String courierId;
     private Double latitude;
     private Double longitude;
 }
