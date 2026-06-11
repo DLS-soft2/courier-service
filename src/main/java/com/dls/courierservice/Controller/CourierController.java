@@ -5,6 +5,7 @@ import com.dls.authlib.RequirePermission;
 import com.dls.courierservice.DTO.CourierRequest;
 import com.dls.courierservice.DTO.CourierResponse;
 import com.dls.courierservice.Service.CourierService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,13 @@ public class CourierController {
     @RequirePermission(Permission.COURIERS_READ)
     public ResponseEntity<List<CourierResponse>> getAllCouriers() {
         return ResponseEntity.ok(courierService.getAllCouriers());
+    }
+
+    @GetMapping("/me")
+    @RequirePermission(Permission.COURIERS_READ)
+    public ResponseEntity<CourierResponse> getCurrentCourier(HttpServletRequest request) {
+        String keycloakId = request.getHeader("X-User-Id");
+        return ResponseEntity.ok(courierService.getCourierByKeycloakId(keycloakId));
     }
 
     @GetMapping("/{id}")
@@ -53,8 +61,9 @@ public class CourierController {
 
     @PostMapping
     @RequirePermission(Permission.COURIERS_UPDATE)
-    public ResponseEntity<CourierResponse> addCourier(@RequestBody CourierRequest courierRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(courierService.addCourier(courierRequest));
+    public ResponseEntity<CourierResponse> addCourier(@RequestBody CourierRequest courierRequest, HttpServletRequest request) {
+        String keycloakId = request.getHeader("X-User-Id");
+        return ResponseEntity.status(HttpStatus.CREATED).body(courierService.addCourier(courierRequest, keycloakId));
     }
 
     @PutMapping("/{id}")

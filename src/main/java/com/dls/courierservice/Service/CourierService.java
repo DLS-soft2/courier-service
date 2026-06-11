@@ -49,7 +49,13 @@ public class CourierService {
                 .orElseThrow(() -> new RuntimeException("Courier not found with email: " + email));
     }
 
-    public CourierResponse addCourier(CourierRequest courierRequest) {
+    public CourierResponse getCourierByKeycloakId(String keycloakId) {
+        return courierRepository.findByKeycloakId(keycloakId)
+                .map(CourierResponse::new)
+                .orElseThrow(() -> new RuntimeException("Courier not found for keycloakId: " + keycloakId));
+    }
+
+    public CourierResponse addCourier(CourierRequest courierRequest, String keycloakId) {
         validateCourierName(courierRequest.getName());
         validateCourierPhoneNumber(courierRequest.getPhoneNumber());
         validateCourierEmail(courierRequest.getEmail());
@@ -59,6 +65,7 @@ public class CourierService {
 
         Courier courier = new Courier();
         courier.setCourierId(UUID.randomUUID().toString());
+        courier.setKeycloakId(keycloakId);
         courier.setName(courierRequest.getName());
         courier.setPhoneNumber(courierRequest.getPhoneNumber());
         courier.setEmail(courierRequest.getEmail());

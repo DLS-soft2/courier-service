@@ -15,6 +15,7 @@ public class CourierResponse {
     private String phoneNumber;
     private VehicleType vehicleType;
     private String email;
+    private String keycloakId;
     private Double rating;
     private Boolean active;
 
@@ -23,6 +24,7 @@ public class CourierResponse {
         this.name = courier.getName();
         this.phoneNumber = courier.getPhoneNumber();
         this.email = courier.getEmail();
+        this.keycloakId = courier.getKeycloakId();
         this.vehicleType = courier.getVehicleType();
         this.rating = courier.getRating();
         this.active = courier.getActive();

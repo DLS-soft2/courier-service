@@ -93,6 +93,8 @@ public class CourierAssignmentService {
         delivery.setCustomerId(event.getCustomerId());
         delivery.setCourier(selectedCourier);
         delivery.setStatus(DeliveryStatus.ASSIGNED);
+        delivery.setPickupAddress(event.getRestaurantAddress());
+        delivery.setDeliveryAddress(event.getDeliveryAddress());
         delivery.setAssignedAt(LocalDateTime.now());
         deliveryRepository.save(delivery);
 

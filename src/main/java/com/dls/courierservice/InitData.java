@@ -42,6 +42,7 @@ public class InitData implements CommandLineRunner {
         courier1.setName("Ox");
         courier1.setPhoneNumber("22335432");
         courier1.setEmail("oxCourier@gmail.com");
+        courier1.setKeycloakId("aaaaaaaa-1111-2222-3333-000000000002");
         courier1.setVehicleType(VehicleType.BIKE);
         courier1.setRating(4.5);
         courier1.setActive(true);

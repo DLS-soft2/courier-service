@@ -30,30 +30,30 @@ class CourierServiceValidationTest {
 
         CourierRequest request = validRequest();
         request.setRating(4.5);
-        assertDoesNotThrow(() -> courierService.addCourier(request));
+        assertDoesNotThrow(() -> courierService.addCourier(request, "kc-test-user"));
 
         request.setRating(3.7);
-        assertDoesNotThrow(() -> courierService.addCourier(request));
+        assertDoesNotThrow(() -> courierService.addCourier(request, "kc-test-user"));
 
         request.setRating(0.0);
-        assertDoesNotThrow(() -> courierService.addCourier(request));
+        assertDoesNotThrow(() -> courierService.addCourier(request, "kc-test-user"));
 
         request.setRating(5.0);
-        assertDoesNotThrow(() -> courierService.addCourier(request));
+        assertDoesNotThrow(() -> courierService.addCourier(request, "kc-test-user"));
     }
 
     @Test
     void addCourier_rejectsRatingBelowZero() {
         CourierRequest request = validRequest();
         request.setRating(-0.1);
-        assertThrows(IllegalArgumentException.class, () -> courierService.addCourier(request));
+        assertThrows(IllegalArgumentException.class, () -> courierService.addCourier(request, "kc-test-user"));
     }
 
     @Test
     void addCourier_rejectsRatingAboveFive() {
         CourierRequest request = validRequest();
         request.setRating(5.1);
-        assertThrows(IllegalArgumentException.class, () -> courierService.addCourier(request));
+        assertThrows(IllegalArgumentException.class, () -> courierService.addCourier(request, "kc-test-user"));
     }
 
     @Test
@@ -62,7 +62,7 @@ class CourierServiceValidationTest {
 
         CourierRequest request = validRequest();
         request.setRating(null);
-        assertDoesNotThrow(() -> courierService.addCourier(request));
+        assertDoesNotThrow(() -> courierService.addCourier(request, "kc-test-user"));
     }
 
     @Test
@@ -70,7 +70,7 @@ class CourierServiceValidationTest {
         when(courierRepository.save(any(Courier.class))).thenAnswer(inv -> inv.getArgument(0));
 
         CourierRequest request = validRequest();
-        var response = courierService.addCourier(request);
+        var response = courierService.addCourier(request, "kc-test-user");
         assertNotNull(response.getCourierId());
         assertEquals(36, response.getCourierId().length());
     }

@@ -26,6 +26,9 @@ public class Courier {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "keycloak_id")
+    private String keycloakId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "vehicle_type", nullable = false)
     private VehicleType vehicleType;
