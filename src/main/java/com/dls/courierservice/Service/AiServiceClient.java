@@ -6,9 +6,12 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -21,13 +24,20 @@ public class AiServiceClient {
     private final RestClient restClient;
 
     public AiServiceClient(@Value("${app.ai-service.url}") String aiServiceUrl) {
-        this.restClient = RestClient.builder().baseUrl(aiServiceUrl).build();
+        // HTTP/1.1 only: the JDK client's default h2c upgrade makes uvicorn drop the request body
+        HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
+        this.restClient = RestClient.builder()
+                .baseUrl(aiServiceUrl)
+                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
+                .build();
     }
 
     public List<CourierRanking> scoreAssignment(AssignmentRequest request) {
         try {
             AssignmentResponse response = restClient.post()
                     .uri("/api/v1/assignments/score")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
                     .body(AssignmentResponse.class);

@@ -15,6 +15,9 @@ import com.dls.courierservice.Service.AiServiceClient;
 import com.dls.courierservice.Service.AiServiceClient.AssignmentRequest;
 import com.dls.courierservice.Service.AiServiceClient.CourierRanking;
 import com.dls.courierservice.Service.CourierAssignmentService;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -254,10 +257,49 @@ class CourierAssignmentServiceTest {
     }
 
     @Test
+    void aiServiceClient_sendsJsonBodyAndUsesAiRankings() throws Exception {
+        try (MockWebServer server = new MockWebServer()) {
+            server.enqueue(new MockResponse()
+                    .setHeader("Content-Type", "application/json")
+                    .setBody("{\"order_id\":\"550e8400-e29b-41d4-a716-446655440099\","
+                            + "\"rankings\":[{\"courier_id\":\"ai-first\",\"score\":0.91,"
+                            + "\"estimated_delivery_minutes\":14,\"reasoning\":\"AI selected\"}]}"));
+
+            AiServiceClient realClient = new AiServiceClient(server.url("/").toString());
+            AssignmentRequest request = sampleAssignmentRequest();
+
+            List<CourierRanking> rankings = realClient.scoreAssignment(request);
+            RecordedRequest recorded = server.takeRequest();
+            String requestBody = recorded.getBody().readUtf8();
+
+            assertEquals("ai-first", rankings.getFirst().getCourierId());
+            assertEquals(0.91, rankings.getFirst().getScore());
+            assertEquals("POST", recorded.getMethod());
+            assertEquals("/api/v1/assignments/score", recorded.getPath());
+            assertEquals("application/json", recorded.getHeader("Content-Type"));
+            // uvicorn drops the body of h2c upgrade requests; the client must stay on HTTP/1.1
+            assertNull(recorded.getHeader("Upgrade"));
+            assertTrue(requestBody.contains("\"order_id\""));
+            assertTrue(requestBody.contains("\"restaurant_location\""));
+            assertTrue(requestBody.contains("\"current_location\""));
+            assertFalse(requestBody.isBlank());
+        }
+    }
+
+    @Test
     void aiServiceClient_fallbackReturnsRankingsByRatingDescending() {
         // Directly test AiServiceClient with unreachable URL to verify fallback
         AiServiceClient realClient = new AiServiceClient("http://localhost:1");
+        AssignmentRequest request = sampleAssignmentRequest();
 
+        List<CourierRanking> rankings = realClient.scoreAssignment(request);
+
+        assertFalse(rankings.isEmpty());
+        assertEquals("high-rated", rankings.getFirst().getCourierId());
+        assertEquals("low-rated", rankings.get(1).getCourierId());
+    }
+
+    private AssignmentRequest sampleAssignmentRequest() {
         AiServiceClient.CourierCandidate c1 = new AiServiceClient.CourierCandidate();
         c1.setCourierId("low-rated");
         c1.setRating(2.0);
@@ -272,18 +314,13 @@ class CourierAssignmentServiceTest {
         c2.setVehicleType("car");
         c2.setActiveDeliveries(0);
 
-        AiServiceClient.AssignmentRequest request = new AiServiceClient.AssignmentRequest();
+        AssignmentRequest request = new AssignmentRequest();
         request.setOrderId(UUID.fromString("550e8400-e29b-41d4-a716-446655440099"));
         request.setRestaurantLocation(new AiServiceClient.Location(55.0, 12.0));
         request.setDeliveryLocation(new AiServiceClient.Location(55.1, 12.1));
         request.setOrderTotal(100.0);
         request.setItemsCount(3);
         request.setCouriers(List.of(c1, c2));
-
-        List<CourierRanking> rankings = realClient.scoreAssignment(request);
-
-        assertFalse(rankings.isEmpty());
-        assertEquals("high-rated", rankings.getFirst().getCourierId());
-        assertEquals("low-rated", rankings.get(1).getCourierId());
+        return request;
     }
 }
