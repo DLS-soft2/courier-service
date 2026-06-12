@@ -102,7 +102,8 @@ public class CourierAssignmentService {
         deliveryRepository.save(delivery);
 
         CourierAssignedEvent assignedEvent = new CourierAssignedEvent(
-                event.getOrderId(), event.getCustomerId(), selectedCourier.getCourierId());
+                event.getOrderId(), event.getCustomerId(), selectedCourier.getCourierId(),
+                selectedCourier.getName());
         kafkaTemplate.send(couriersTopic, event.getOrderId(), assignedEvent);
         log.info("Published CourierAssigned for order_id={}, courier_id={}",
                 event.getOrderId(), selectedCourier.getCourierId());

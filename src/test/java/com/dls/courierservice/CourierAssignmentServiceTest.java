@@ -59,12 +59,14 @@ class CourierAssignmentServiceTest {
 
         courier1 = new Courier();
         courier1.setCourierId("uuid-courier-1");
+        courier1.setName("Ox");
         courier1.setRating(4.5);
         courier1.setActive(true);
         courier1.setVehicleType(VehicleType.BIKE);
 
         courier2 = new Courier();
         courier2.setCourierId("uuid-courier-2");
+        courier2.setName("DLS");
         courier2.setRating(3.0);
         courier2.setActive(true);
         courier2.setVehicleType(VehicleType.CAR);
@@ -127,6 +129,7 @@ class CourierAssignmentServiceTest {
         assertEquals("550e8400-e29b-41d4-a716-446655440011", published.getOrderId());
         assertEquals("cust-222", published.getCustomerId());
         assertEquals("uuid-courier-2", published.getCourierId());
+        assertEquals("DLS", published.getCourierName());
         assertNotNull(published.getEventId());
         assertNotNull(published.getTimestamp());
     }
@@ -163,6 +166,7 @@ class CourierAssignmentServiceTest {
         ArgumentCaptor<CourierAssignedEvent> eventCaptor = ArgumentCaptor.forClass(CourierAssignedEvent.class);
         verify(kafkaTemplate).send(eq("couriers"), eq("550e8400-e29b-41d4-a716-446655440044"), eventCaptor.capture());
         assertEquals("uuid-courier-1", eventCaptor.getValue().getCourierId());
+        assertEquals("Ox", eventCaptor.getValue().getCourierName());
     }
 
     @Test
@@ -189,6 +193,7 @@ class CourierAssignmentServiceTest {
         String publishedCourierId = eventCaptor.getValue().getCourierId();
         assertEquals("uuid-courier-1", publishedCourierId);
         assertEquals(courier1.getCourierId(), publishedCourierId);
+        assertEquals("Ox", eventCaptor.getValue().getCourierName());
     }
 
     @Test

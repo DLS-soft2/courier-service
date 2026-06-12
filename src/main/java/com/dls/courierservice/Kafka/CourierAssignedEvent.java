@@ -26,12 +26,16 @@ public class CourierAssignedEvent {
     @JsonProperty("courier_id")
     private String courierId;
 
+    @JsonProperty("courier_name")
+    private String courierName;
+
     @JsonProperty("timestamp")
     private String timestamp = Instant.now().toString();
 
-    public CourierAssignedEvent(String orderId, String customerId, String courierId) {
+    public CourierAssignedEvent(String orderId, String customerId, String courierId, String courierName) {
         this.orderId = orderId;
         this.customerId = customerId;
         this.courierId = courierId;
+        this.courierName = courierName;
     }
 }
