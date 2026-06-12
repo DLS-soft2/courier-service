@@ -7,6 +7,7 @@ import com.dls.courierservice.Enum.AvailabilityStatus;
 import com.dls.courierservice.Enum.DeliveryStatus;
 import com.dls.courierservice.Enum.VehicleType;
 import com.dls.courierservice.Kafka.CourierAssignedEvent;
+import com.dls.courierservice.Kafka.CourierAssignmentFailedEvent;
 import com.dls.courierservice.Kafka.RestaurantAcceptedEvent;
 import com.dls.courierservice.Repository.CourierStatusRepository;
 import com.dls.courierservice.Repository.DeliveryRepository;
@@ -188,6 +189,63 @@ class CourierAssignmentServiceTest {
         String publishedCourierId = eventCaptor.getValue().getCourierId();
         assertEquals("uuid-courier-1", publishedCourierId);
         assertEquals(courier1.getCourierId(), publishedCourierId);
+    }
+
+    @Test
+    void assignCourier_noCandidates_publishesAssignmentFailed() {
+        when(courierStatusRepository.findByStatus(AvailabilityStatus.AVAILABLE))
+                .thenReturn(List.of());
+
+        RestaurantAcceptedEvent event = new RestaurantAcceptedEvent();
+        event.setOrderId("550e8400-e29b-41d4-a716-446655440022");
+        event.setCustomerId("cust-333");
+        event.setRestaurantId("rest-444");
+
+        service.assignCourier(event);
+
+        ArgumentCaptor<CourierAssignmentFailedEvent> eventCaptor =
+                ArgumentCaptor.forClass(CourierAssignmentFailedEvent.class);
+        verify(kafkaTemplate).send(eq("couriers"), eq("550e8400-e29b-41d4-a716-446655440022"), eventCaptor.capture());
+        CourierAssignmentFailedEvent published = eventCaptor.getValue();
+        assertEquals("CourierAssignmentFailed", published.getEventType());
+        assertEquals("550e8400-e29b-41d4-a716-446655440022", published.getOrderId());
+        assertEquals("cust-333", published.getCustomerId());
+        assertEquals("rest-444", published.getRestaurantId());
+        assertEquals("No available couriers", published.getReason());
+        assertNotNull(published.getEventId());
+        assertNotNull(published.getTimestamp());
+
+        verify(deliveryRepository, never()).save(any());
+    }
+
+    @Test
+    void assignCourier_noRankings_publishesAssignmentFailed() {
+        when(courierStatusRepository.findByStatus(AvailabilityStatus.AVAILABLE))
+                .thenReturn(List.of(status1));
+        when(deliveryRepository.countByCourierAndStatusNotIn(any(), anyList())).thenReturn(0);
+        when(aiServiceClient.scoreAssignment(any(AssignmentRequest.class)))
+                .thenReturn(List.of());
+
+        RestaurantAcceptedEvent event = new RestaurantAcceptedEvent();
+        event.setOrderId("550e8400-e29b-41d4-a716-446655440033");
+        event.setCustomerId("cust-444");
+        event.setRestaurantId("rest-555");
+
+        service.assignCourier(event);
+
+        ArgumentCaptor<CourierAssignmentFailedEvent> eventCaptor =
+                ArgumentCaptor.forClass(CourierAssignmentFailedEvent.class);
+        verify(kafkaTemplate).send(eq("couriers"), eq("550e8400-e29b-41d4-a716-446655440033"), eventCaptor.capture());
+        CourierAssignmentFailedEvent published = eventCaptor.getValue();
+        assertEquals("CourierAssignmentFailed", published.getEventType());
+        assertEquals("550e8400-e29b-41d4-a716-446655440033", published.getOrderId());
+        assertEquals("cust-444", published.getCustomerId());
+        assertEquals("rest-555", published.getRestaurantId());
+        assertEquals("AI scoring returned no rankings", published.getReason());
+        assertNotNull(published.getEventId());
+        assertNotNull(published.getTimestamp());
+
+        verify(deliveryRepository, never()).save(any());
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.dls.courierservice.Entity.Delivery;
 import com.dls.courierservice.Enum.AvailabilityStatus;
 import com.dls.courierservice.Enum.DeliveryStatus;
 import com.dls.courierservice.Kafka.CourierAssignedEvent;
+import com.dls.courierservice.Kafka.CourierAssignmentFailedEvent;
 import com.dls.courierservice.Kafka.RestaurantAcceptedEvent;
 import com.dls.courierservice.Repository.CourierStatusRepository;
 import com.dls.courierservice.Repository.DeliveryRepository;
@@ -69,6 +70,7 @@ public class CourierAssignmentService {
 
         if (candidates.isEmpty()) {
             log.warn("No available couriers for order_id={}", event.getOrderId());
+            publishAssignmentFailed(event, "No available couriers");
             return;
         }
 
@@ -77,6 +79,7 @@ public class CourierAssignmentService {
 
         if (rankings.isEmpty()) {
             log.warn("No rankings returned for order_id={}", event.getOrderId());
+            publishAssignmentFailed(event, "AI scoring returned no rankings");
             return;
         }
 
@@ -103,6 +106,14 @@ public class CourierAssignmentService {
         kafkaTemplate.send(couriersTopic, event.getOrderId(), assignedEvent);
         log.info("Published CourierAssigned for order_id={}, courier_id={}",
                 event.getOrderId(), selectedCourier.getCourierId());
+    }
+
+    private void publishAssignmentFailed(RestaurantAcceptedEvent event, String reason) {
+        CourierAssignmentFailedEvent failedEvent = new CourierAssignmentFailedEvent(
+                event.getOrderId(), event.getCustomerId(), event.getRestaurantId(), reason);
+        kafkaTemplate.send(couriersTopic, event.getOrderId(), failedEvent);
+        log.info("Published CourierAssignmentFailed for order_id={}, reason={}",
+                event.getOrderId(), reason);
     }
 
     private AssignmentRequest buildAssignmentRequest(RestaurantAcceptedEvent event, List<CourierStatus> candidates) {
