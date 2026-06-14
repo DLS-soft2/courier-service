@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -25,10 +26,15 @@ public class AiServiceClient {
 
     public AiServiceClient(@Value("${app.ai-service.url}") String aiServiceUrl) {
         // HTTP/1.1 only: the JDK client's default h2c upgrade makes uvicorn drop the request body
-        HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
+        HttpClient httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
+        factory.setReadTimeout(Duration.ofSeconds(120));
         this.restClient = RestClient.builder()
                 .baseUrl(aiServiceUrl)
-                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
+                .requestFactory(factory)
                 .build();
     }
 
