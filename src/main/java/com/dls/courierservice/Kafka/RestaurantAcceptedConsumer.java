@@ -64,9 +64,8 @@ public class RestaurantAcceptedConsumer {
             return;
         }
 
-        processedEventRepository.save(new ProcessedEvent(eventId, Instant.now()));
-
         courierAssignmentService.assignCourier(event);
+        processedEventRepository.save(new ProcessedEvent(eventId, Instant.now()));
         log.info("Processed RestaurantAccepted event_id={} for order_id={}", eventId, event.getOrderId());
     }
 }

@@ -36,7 +36,7 @@ class RestaurantAcceptedConsumerTest {
     }
 
     @Test
-    void happyPath_marksProcessedBeforeDelegation() {
+    void happyPath_assignsBeforeMarkingProcessed() {
         String message = """
                 {
                     "event_type": "RestaurantAccepted",
@@ -65,9 +65,9 @@ class RestaurantAcceptedConsumerTest {
         assertEquals("rest-001", captured.getRestaurantId());
         assertEquals(15, captured.getEstimatedPrepTime());
 
-        InOrder inOrder = inOrder(processedEventRepository, courierAssignmentService);
-        inOrder.verify(processedEventRepository).save(any(ProcessedEvent.class));
+        InOrder inOrder = inOrder(courierAssignmentService, processedEventRepository);
         inOrder.verify(courierAssignmentService).assignCourier(any(RestaurantAcceptedEvent.class));
+        inOrder.verify(processedEventRepository).save(any(ProcessedEvent.class));
     }
 
     @Test
@@ -123,6 +123,31 @@ class RestaurantAcceptedConsumerTest {
         consumer.consume(message);
 
         verify(courierAssignmentService, never()).assignCourier(any());
+        verify(processedEventRepository, never()).save(any());
+    }
+
+    @Test
+    void retryAfterAssignmentFailure_doesNotSkip() {
+        String message = """
+                {
+                    "event_type": "RestaurantAccepted",
+                    "event_id": "evt-retry",
+                    "order_id": "order-abc",
+                    "customer_id": "cust-xyz",
+                    "restaurant_id": "rest-001",
+                    "estimated_prep_time": 15,
+                    "timestamp": "2026-06-10T10:00:00Z"
+                }
+                """;
+
+        when(processedEventRepository.existsById("evt-retry")).thenReturn(false);
+        doThrow(new RuntimeException("AI service down"))
+                .when(courierAssignmentService).assignCourier(any(RestaurantAcceptedEvent.class));
+
+        assertThrows(RuntimeException.class, () -> consumer.consume(message));
+        assertThrows(RuntimeException.class, () -> consumer.consume(message));
+
+        verify(courierAssignmentService, times(2)).assignCourier(any(RestaurantAcceptedEvent.class));
         verify(processedEventRepository, never()).save(any());
     }
 }
